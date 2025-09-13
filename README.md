@@ -1,6 +1,8 @@
 # Dự án Phân tích và Dự báo Năng lượng
 
-Dự án này thu thập, phân tích và dự báo dữ liệu năng lượng và thời tiết bằng các mô hình học máy (LSTM, SARIMAX) để dự đoán nhu cầu năng lượng.
+Dự án này tập trung xây dựng một hệ thống dự báo nhu cầu điện theo thời gian thực. Toàn bộ quy trình bao gồm: thu thập dữ liệu về sản lượng điện và yếu tố thời tiết, làm sạch và tiền xử lý dữ liệu, sau đó áp dụng cả mô hình học sâu (LSTM) và mô hình thống kê (SARIMAX) để tạo ra các dự báo chính xác.
+
+Điểm đặc biệt của hệ thống là sự kết hợp giữa các công nghệ dữ liệu lớn và các mô hình phân tích tiên tiến. Trong đó, Apache Kafka được sử dụng để xử lý luồng dữ liệu liên tục, trong khi Redis hỗ trợ lưu trữ kết quả tạm thời nhằm tối ưu tốc độ truy xuất. Phần kết quả dự báo được triển khai thông qua API backend (FastAPI) và một giao diện trực quan với Streamlit, giúp người dùng dễ dàng theo dõi, kiểm tra và truy vấn thông tin dự báo trong thời gian thực.
 
 ## Cấu trúc dự án
 
