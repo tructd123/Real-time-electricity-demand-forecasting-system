@@ -1,0 +1,16 @@
+pandas
+numpy
+scikit-learn
+tensorflow
+statsmodels
+matplotlib
+seaborn
+streamlit
+plotly
+requests
+fastapi
+uvicorn
+kafka-python
+redis
+joblib
+pyspark
