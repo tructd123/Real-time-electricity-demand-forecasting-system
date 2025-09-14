@@ -8,7 +8,7 @@ import uuid
 import time
 from fastapi.responses import JSONResponse
 
-app = FastAPI()
+app = FastAPI() 
 
 # Khởi tạo Kafka Producer
 producer = KafkaProducer(
