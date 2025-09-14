@@ -85,10 +85,11 @@ if response.status_code == 200:
 
     st.plotly_chart(fig, use_container_width=True)
 # Phân tích theo bang
-df_state = pd.DataFrame(state_data)
-st.subheader(f"🔹 Sản lượng điện theo bang ngày {selected_date}")
-fig2 = px.bar(df_state, x="region", y="value", color="region", text_auto=True)
-st.plotly_chart(fig2, use_container_width=True)
+if state_data and isinstance(state_data, list) and len(state_data) > 1:
+    df_state = pd.DataFrame(state_data)
+    st.subheader(f"🔹 So sánh sản lượng điện các bang ngày {selected_date}")
+    fig2 = px.bar(df_state, x="region", y="value", color="region", text_auto=True)
+    st.plotly_chart(fig2, use_container_width=True)
 
 # Phân tích theo nguồn
 response = requests.get(
@@ -98,8 +99,8 @@ response = requests.get(
 
 if response.status_code == 200:
 
-    data = response.json()  # Toàn bộ JSON
-    df_source = pd.DataFrame(data["generation_results"])  # Chỉ lấy phần dữ liệu cần vẽ
+    data = response.json()
+    df_source = pd.DataFrame(data)
 
     st.subheader(f"🔹 Sản lượng điện theo nguồn tại {selected_state} ngày {selected_date}")
 

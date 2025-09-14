@@ -18,18 +18,31 @@ Dự án này tập trung xây dựng một hệ thống dự báo nhu cầu đi
     -   `test/`: Kịch bản kiểm thử streaming với Kafka và Redis (`docker-compose.yml`).
 -   **`requirements.txt`**: Danh sách các thư viện cần thiết.
 
-## Hướng dẫn Triển khai (Deployment)
+## Hướng dẫn Triển khai và Chạy Dự án
 
-Dự án cung cấp hai kịch bản triển khai trong thư mục `deploy/`:
+Dự án này có thể được triển khai theo nhiều cách khác nhau, từ một API đơn giản đến một hệ thống streaming dữ liệu thời gian thực hoàn chỉnh.
 
-1.  **`backend/`**: Một API đơn giản để phục vụ dự báo.
-2.  **`test/`**: Một hệ thống streaming dữ liệu thời gian thực hoàn chỉnh sử dụng Kafka để mô phỏng và kiểm thử.
+### 1. Giao diện Người dùng (Streamlit Frontend)
 
-### Kịch bản 1: API Đơn giản (Thư mục `backend`)
+File `deploy/app.py` là giao diện người dùng để trực quan hóa dữ liệu và tương tác với các dự báo. Giao diện này cần kết nối đến một API backend (FastAPI) đang chạy.
+
+**Cách chạy:**
+
+1.  **Khởi chạy một trong các API backend** ở các kịch bản dưới đây trước.
+2.  Mở một terminal mới, di chuyển vào thư mục gốc của dự án.
+3.  **Chạy lệnh:**
+    ```bash
+    streamlit run deploy/app.py
+    ```
+4.  Giao diện sẽ mở trong trình duyệt của bạn.
+
+---
+
+### 2. Kịch bản API Đơn giản (Thư mục `backend`)
 
 Đây là cách triển khai cơ bản nhất, cung cấp các endpoint API để truy vấn dự báo mà không cần đến Kafka.
 
-**Luồng hoạt động:** Người dùng gửi yêu cầu HTTP -> Server FastAPI xử lý -> Trả kết quả trực tiếp.
+**Luồng hoạt động:** Người dùng (hoặc Frontend) gửi yêu cầu HTTP -> Server FastAPI xử lý -> Trả kết quả trực tiếp.
 
 **Cách chạy:**
 
@@ -45,12 +58,15 @@ Dự án cung cấp hai kịch bản triển khai trong thư mục `deploy/`:
 
 3.  **Khởi chạy server FastAPI:**
     ```bash
+    # API sẽ chạy ở cổng 8000, đúng với cổng mà app.py đang gọi
     uvicorn main:app --reload --port 8000
     ```
 
-4.  Server sẽ chạy tại `http://127.0.0.1:8000`. Bạn có thể truy cập `http://127.0.0.1:8000/docs` để xem tài liệu API và thử nghiệm.
+4.  Sau khi server này chạy, bạn có thể khởi chạy Giao diện Người dùng (Streamlit) ở trên.
 
-### Kịch bản 2: Hệ thống Real-time với Kafka (Thư mục `test`)
+---
+
+### 3. Kịch bản Hệ thống Real-time với Kafka (Thư mục `test`)
 
 Kịch bản này mô phỏng một pipeline xử lý dữ liệu thời gian thực hoàn chỉnh.
 
@@ -66,7 +82,7 @@ Kịch bản này mô phỏng một pipeline xử lý dữ liệu thời gian th
       cd deploy/test
       docker-compose up -d
       ```
-    - **Mục đích:** Khởi chạy Zookeeper, Kafka, và Redis trong các container Docker.
+    - **Mục đích:** Khởi chạy Zookeeper, Kafka, và Redis.
 
 2.  **Terminal 2: Khởi chạy API Server (và Kafka Producer)**
     - **Lệnh:**
@@ -74,7 +90,8 @@ Kịch bản này mô phỏng một pipeline xử lý dữ liệu thời gian th
       cd deploy/test
       # Cài đặt thư viện nếu cần
       pip install -r ../../requirements.txt 
-      uvicorn main:app --reload --port 8001
+      # Chạy API ở cổng 8000 để frontend có thể kết nối
+      uvicorn main:app --reload --port 8000
       ```
     - **Mục đích:** Chạy server FastAPI. Server này vừa trả lời API, vừa gửi dữ liệu vào Kafka.
 
@@ -84,7 +101,7 @@ Kịch bản này mô phỏng một pipeline xử lý dữ liệu thời gian th
       cd deploy/test
       python producer.py
       ```
-    - **Mục đích:** Script này sẽ liên tục gọi các API trên server (chạy ở Terminal 2) để tạo ra luồng dữ liệu.
+    - **Mục đích:** Script này sẽ liên tục gọi các API trên server để tạo ra luồng dữ liệu.
 
 4.  **Terminal 4: Chạy Trình xử lý Dữ liệu (Consumer)**
     - **Lệnh:**
@@ -92,11 +109,13 @@ Kịch bản này mô phỏng một pipeline xử lý dữ liệu thời gian th
       cd deploy/test
       python consumer.py
       ```
-    - **Mục đích:** Lắng nghe dữ liệu từ các topic trên Kafka và in ra màn hình. Đây là nơi bạn thấy kết quả cuối cùng của pipeline.
+    - **Mục đích:** Lắng nghe dữ liệu từ Kafka và in ra màn hình.
+
+**Lưu ý:** Sau khi chạy xong Terminal 1 và 2, bạn có thể khởi chạy Giao diện Người dùng (Streamlit) để xem dữ liệu được cập nhật.
 
 ### Dừng hệ thống `test`
 
-Để dừng tất cả các container Docker đã khởi chạy, chạy lệnh sau trong thư mục `deploy/test`:
+Để dừng tất cả các container Docker, chạy lệnh sau trong thư mục `deploy/test`:
 ```bash
 docker-compose down
 ```
